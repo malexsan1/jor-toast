@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useEscapeKey } from "../../hooks";
+
 export const ToastContext = React.createContext();
 
 export const useToastContext = () => {
@@ -28,24 +30,14 @@ function ToastProvider({ children }) {
     );
   }, []);
 
+  const clearToasts = React.useCallback(() => setToasts([]), []);
+
   const providerValue = React.useMemo(
     () => ({ toasts, addToast, removeToast }),
     [toasts, addToast, removeToast]
   );
 
-  React.useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setToasts([]);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+  useEscapeKey(clearToasts);
 
   return (
     <ToastContext.Provider value={providerValue}>
